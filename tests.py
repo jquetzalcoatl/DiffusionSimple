@@ -22,20 +22,56 @@ import getpass
 sys.path.insert(1, '/home/' + getpass.getuser() + '/Projects/DiffusionSimple/util')
 
 from loaders import generateDatasets, inOut, saveJSON, loadJSON#, MyData
-from NNets import SimpleCNN, UNet
-from tools import accuracy, tools, per_image_error, predVsTarget, errInDS, errInDS_2
+from tools import accuracy, tools, per_image_error, predVsTarget, errInDS, errInDS_2, errOverLat
 from plotter import myPlots, plotSamp, plotSampRelative
+from NNets import SimpleCNN, SimpleCNNConvT, SimpleCNN_L, SimpleCNN_S, UNet, LeakyUNet, SimpleCNNCat, SimpleCNNJules, SimpleCNNReflect, UNetGPT, UNetBias0, UNetPrelu, SimpleCNNJulesPB, UNetPB, UNetPreluPB
 
-# class DiffSur(SimpleCNN):
-#     pass
 def select_nn(arg, d=None, num_samples=1):
     if arg == "SimpleCNN":
-        class DiffSur(SimpleCNN100):
+        class DiffSur(SimpleCNN):
             pass 
     elif arg == "UNet":
         class DiffSur(UNet):
             pass
-        return DiffSur()
+    elif arg == "SimpleCNNConvT":
+        class DiffSur(SimpleCNNConvT):
+            pass
+    elif arg == "SimpleCNN_L":
+        class DiffSur(SimpleCNN_L):
+            pass
+    elif arg == "SimpleCNN_S":
+        class DiffSur(SimpleCNN_S):
+            pass
+    elif arg == "LeakyUNet":
+        class DiffSur(LeakyUNet):
+            pass
+    elif arg == "SimpleCNNCat":
+        class DiffSur(SimpleCNNCat):
+            pass
+    elif arg == "SimpleCNNJules":
+        class DiffSur(SimpleCNNJules):
+            pass
+    elif arg == "SimpleCNNReflect":
+        class DiffSur(SimpleCNNReflect):
+            pass
+    elif arg == "UNetGPT":
+        class DiffSur(UNetGPT):
+            pass
+    elif arg == "UNetBias0":
+        class DiffSur(UNetBias0):
+            pass
+    elif arg == "UNetPrelu":
+        class DiffSur(UNetPrelu):
+            pass
+    elif arg == "SimpleCNNJulesPB":
+        class DiffSur(SimpleCNNJulesPB):
+            pass
+    elif arg == "UNetPB":
+        class DiffSur(UNetPB):
+            pass
+    elif arg == "UNetPreluPB":
+        class DiffSur(UNetPreluPB):
+            pass
     return DiffSur()
 
 class thelogger(object):
@@ -73,7 +109,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser("Train Deep Diffusion Solver")
     parser.add_argument('--path', dest="path", type=str, default='/home/' + getpass.getuser() +'/Projects/DiffusionSimple/Results/',
                         help="Specify path to dataset")   #Change
-    parser.add_argument('--dataset', dest="dataset", type=str, default="Data",
+    parser.add_argument('--dataset', dest="dataset", type=str, default="Datav2",
                         help="Specify dataset")
     parser.add_argument('--dir', dest="dir", type=str, default="100DGX-" + str(datetime.now()).split(" ")[0],
                         help="Specify directory name associated to model")
@@ -136,7 +172,7 @@ if __name__ == '__main__':
 
     selectedDirs = {dir : {"mean" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "max" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "maxmean" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "min" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "minmean" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}}}
 
-    datasetNameList = ['Data'] # [f'{i}SourcesRdm' for i in range(1,21)]
+    datasetNameList = ['Datav2'] # [f'{i}SourcesRdm' for i in range(1,21)]
     error, errorField, errorSrc = [], [], []
 
     for selectedDir in selectedDirs.keys():
@@ -156,7 +192,7 @@ if __name__ == '__main__':
         myLog.logging.info(f'Generating tests using MSE... for model {selectedDir}')
         for (j, ds) in enumerate(datasetNameList):
             myLog.logging.info(f'Dataset: {ds}')
-            trainloader, testloader = generateDatasets(PATH, datasetName=ds, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.1, s=100, transformation=dict["transformation"], val=False).getDataLoaders()
+            trainloader, testloader = generateDatasets(PATH, datasetName=ds, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.1, s=256, transformation=dict["transformation"], val=False).getDataLoaders()
     #     selectedDirs[selectedDir] = t.errorPerDataset(PATH, theModel, device, BATCH_SIZE=BATCH_SIZE, NUM_WORKERS=NUM_WORKERS, std_tr=0.0, s=512)
             arr = errInDS(theModel, testloader, device, transformation=dict["transformation"], error_fnc=nn.MSELoss(reduction='none'))
             selectedDirs[selectedDir]["mean"]["all"].append(arr[0])
@@ -224,7 +260,7 @@ if __name__ == '__main__':
 #         myLog.logging.info(f'Generating tests using MSE on training set... for model {selectedDir}')
 #         for (j, ds) in enumerate(datasetNameList):
 #             myLog.logging.info(f'Dataset: {ds}')
-#             trainloader, testloader = generateDatasets(PATH, datasetName=ds, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.1, s=100, transformation=dict["transformation"], val=True).getDataLoaders()
+#             trainloader, testloader = generateDatasets(PATH, datasetName=ds, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.1, s=256, transformation=dict["transformation"], val=True).getDataLoaders()
 #     #     selectedDirs[selectedDir] = t.errorPerDataset(PATH, theModel, device, BATCH_SIZE=BATCH_SIZE, NUM_WORKERS=NUM_WORKERS, std_tr=0.0, s=512)
 #             arr = errInDS(theModel, trainloader, device, transformation=dict["transformation"], error_fnc=nn.MSELoss(reduction='none'))
 #             selectedDirs[selectedDir]["mean"]["all"].append(arr[0])
@@ -272,7 +308,7 @@ if __name__ == '__main__':
 
 ###################    
     selectedDirs = {dir : {"mean" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "max" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "maxmean" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "min" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "minmean" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}}}
-    datasetNameList = ['Data']#[f'{i}SourcesRdm' for i in range(1,21)]
+#     datasetNameList = ['Data']#[f'{i}SourcesRdm' for i in range(1,21)]
     error, errorField, errorSrc = [], [], []
 
     for selectedDir in selectedDirs.keys():
@@ -290,7 +326,7 @@ if __name__ == '__main__':
         myLog.logging.info(f'Generating tests using MAE... for model {selectedDir}')
         for (j, ds) in enumerate(datasetNameList):
             myLog.logging.info(f'Dataset: {ds}')
-            trainloader, testloader = generateDatasets(PATH, datasetName=ds, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.1, s=100, transformation=dict["transformation"], val=False).getDataLoaders()
+            trainloader, testloader = generateDatasets(PATH, datasetName=ds, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.1, s=256, transformation=dict["transformation"], val=False).getDataLoaders()
             arr = errInDS(theModel, testloader, device, transformation=dict["transformation"])
             selectedDirs[selectedDir]["mean"]["all"].append(arr[0])
             selectedDirs[selectedDir]["mean"]["field"].append(arr[1])
@@ -354,7 +390,7 @@ if __name__ == '__main__':
 #         myLog.logging.info(f'Generating tests using MAE on training set... for model {selectedDir}')
 #         for (j, ds) in enumerate(datasetNameList):
 #             myLog.logging.info(f'Dataset: {ds}')
-#             trainloader, testloader = generateDatasets(PATH, datasetName=ds, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.1, s=100, transformation=dict["transformation"], val=True).getDataLoaders()
+#             trainloader, testloader = generateDatasets(PATH, datasetName=ds, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.1, s=256, transformation=dict["transformation"], val=True).getDataLoaders()
 #             arr = errInDS(theModel, trainloader, device, transformation=dict["transformation"])
 #             selectedDirs[selectedDir]["mean"]["all"].append(arr[0])
 #             selectedDirs[selectedDir]["mean"]["field"].append(arr[1])
@@ -401,8 +437,8 @@ if __name__ == '__main__':
     
 
     myLog.logging.info(f'Generating Sample')
-    dsName = "TwoSourcesRdm"    #args.dataset #"19SourcesRdm"
-    trainloader, testloader = generateDatasets(PATH, datasetName=dsName ,batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.0, s=100, transformation=dict["transformation"], val=False).getDataLoaders()
+    dsName = 'Datav2'    #args.dataset #"19SourcesRdm"
+    trainloader, testloader = generateDatasets(PATH, datasetName=dsName ,batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.0, s=256, transformation=dict["transformation"], val=False).getDataLoaders()
     plotName = f'Model-{dir}_DS-{dsName}_sample.png'
     os.listdir(os.path.join(PATH, "Dict", dir))[0]
     dict = inOut().loadDict(os.path.join(PATH, "Dict", dir, os.listdir(os.path.join(PATH, "Dict", dir))[0]))
@@ -428,8 +464,8 @@ if __name__ == '__main__':
 #         trainloader, testloader = generateDatasets(PATH, datasetName=dsName, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.1, s=512, transformation=dict["transformation"]).getDataLoaders()
 #     except:
 #         trainloader, testloader = generateDatasets(PATH, datasetName=dsName, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.1, s=512).getDataLoaders()
-
-    xi, yi, zi = predVsTarget(testloader, theModel, device, transformation = dict["transformation"], threshold = 0.0, nbins = 100, BATCH_SIZE = BATCH_SIZE, size = 100, lim = 10)
+    myLog.logging.info(f'Generating Error grid...')
+    xi, yi, zi = predVsTarget(testloader, theModel, device, transformation = dict["transformation"], threshold = 0.0, nbins = 100, BATCH_SIZE = BATCH_SIZE, size = 256, lim = 10)
     dataname = f'Model-{dir}_DS-{dsName}.txt'
     np.savetxt(os.path.join(PATH, "AfterPlots", "Pred", dataname), zi.reshape(100,100).transpose())
 
@@ -444,6 +480,25 @@ if __name__ == '__main__':
     plt.colorbar()
     plt.savefig(os.path.join(PATH, "AfterPlots", "Pred", plotName), transparent=False)
     plt.show()
+    myLog.logging.info(f'Error grid generated')
+    
+############
+    myLog.logging.info(f'Generating Error Vs Boundary Band')
+#     dsName = 'Datav2'    #args.dataset #"19SourcesRdm"
+    trainloader, testloader = generateDatasets(PATH, datasetName=dsName ,batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.0, s=256, transformation=dict["transformation"], val=False).getDataLoaders()
+    dir = args.dir
+#     os.listdir(os.path.join(PATH, "Dict", dir))[0]
+    dict = inOut().loadDict(os.path.join(PATH, "Dict", dir, os.listdir(os.path.join(PATH, "Dict", dir))[0]))
+    theModel = selectNN(dict)
+    try:
+            ep,err, theModel = inOut().load_model(diffSolve, "Diff", dict, tag='Best')
+    except:
+        ep,err, theModel = inOut().load_model(diffSolve, "Diff", dict)
+#     ep,err, theModel = inOut().load_model(diffSolve, "Diff", dict)
+    theModel.eval();
+    dd = errOverLat(theModel, testloader, device, transformation="linear", error_fnc=nn.MSELoss(reduction='none'))
+    saveJSON(dd, os.path.join(PATH, "AfterPlots", "errorsVsBoundaryBand"), f'errorVsBB-{dir}.json')
+    myLog.logging.info(f'JSON object saved')
 
 
 #How to run

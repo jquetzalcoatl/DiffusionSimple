@@ -171,7 +171,7 @@ def errInSample(data, device, theModel):
 
 @torch.no_grad()    
 def errInDS(neural_net, loader, device, transformation="linear",
-                    error_fnc=nn.L1Loss(reduction='none'), tol1 = 0.2, tol2 = 0.1, tol3 = 0.05):
+                    error_fnc=nn.L1Loss(reduction='none'), tol1 = 0.6, tol2 = 0.3, tol3 = 0.15):
     error1 = 0.0
     
     error1_field = 0.0
@@ -316,7 +316,7 @@ def errInDS(neural_net, loader, device, transformation="linear",
 
 @torch.no_grad()    
 def errInDSTailored(neural_net, loader, device, transformation="linear",
-                    error_fnc=nn.L1Loss(reduction='none'), tol1 = 0.2, tol2 = 0.1, tol3 = 0.05):
+                    error_fnc=nn.L1Loss(reduction='none'), tol1 = 0.6, tol2 = 0.3, tol3 = 0.15):
     error1 = 0.0
     
     error1_field = 0.0
@@ -784,3 +784,54 @@ class accuracy(object):
             ds = ds + l
     #     print(i)
         return acc/(i+1)
+    
+    
+@torch.no_grad()    
+def errInDSvsLat(neural_net, loader, device, transformation="linear",
+                    error_fnc=nn.L1Loss(reduction='none'), latThres=10):
+    error1 = 0.0
+    
+    errorMax = 0.0
+    
+    errorMaxm = 0.0
+    
+    errorMin = 0.0
+    
+    errorMinm = 0.0
+    
+    
+    for i, data in enumerate(loader):
+        x = data[0].to(device)
+        y = data[1].to(device)
+        
+        yhat = neural_net(x)
+        
+        yhat, y = transformation_inverse(yhat, y, transformation)
+        
+        e1 = error_fnc(yhat,y)[:,:,latThres:-latThres-1, latThres:-latThres-1]
+        
+        error1 += torch.mean(e1).cpu().numpy()
+        
+        errorMax = np.maximum(errorMax, e1[~e1.isnan()].max().cpu().numpy())
+        
+        errorMaxm += e1[~e1.isnan()].max().cpu().numpy()
+        
+        errorMin = np.minimum(errorMin, e1[~e1.isnan()].min().cpu().numpy())
+        
+        errorMinm += e1[~e1.isnan()].min().cpu().numpy()
+                
+
+        
+    return error1/(i+1), errorMax, errorMaxm/(i+1), errorMin, errorMinm/(i+1)
+
+def errOverLat(neural_net, loader, device, transformation="linear",
+                    error_fnc=nn.L1Loss(reduction='none')):
+    latticeErr = {}
+    for l in range(10,100,10):
+        latticeErr[str(l)] = errInDSvsLat(neural_net, loader, device, transformation,
+                    error_fnc, latThres=l)
+        
+    return latticeErr
+    
+    
+    

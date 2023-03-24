@@ -61,14 +61,15 @@ class MyData(Dataset):
         if self.datasetName not in datasetDict.keys():
             file1 = self.path + "/" + self.df.Uptake[index]
             file2 = self.path + "/" + self.df.Secretion[index]
-            file3 = self.path + "/" + self.df.Chemical[index]
+            file3 = self.path + "/" + self.df.CellType[index]
+            file4 = self.path + "/" + self.df.Chemical[index]
         else:
             file = self.path.split("/Results/")[0] + "/Results/" + self.df.Prefix[index] + "/" + \
                    self.path.split("/Results/")[1] + "/" + self.df.Cell[index]
             file2 = self.path.split("/Results/")[0] + "/Results/" + self.df.Prefix[index] + "/" + \
                     self.path.split("/Results/")[1] + "/" + self.df.Field[index]
-        image = self.load_image([file1, file2], add_noise=False)
-        label = self.load_image([file3], add_noise=False)
+        image = self.load_image([file1, file2, file3], add_noise=False)
+        label = self.load_image([file4], add_noise=False)
         return image, label
 
     def load_image(self, file_name, add_noise=False):

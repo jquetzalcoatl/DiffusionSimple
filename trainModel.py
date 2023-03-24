@@ -24,9 +24,9 @@ sys.path.insert(1, '/home/' + getpass.getuser() + '/Projects/DiffusionSimple/uti
 # sys.path.insert(1, '/home/javier/Projects/DiffSolver/DeepDiffusionSolver/util')
 
 from loaders import generateDatasets, inOut, saveJSON, loadJSON#, MyData
-from NNets import SimpleCNN, SimpleCNNConvT, SimpleCNN_L, SimpleCNN_S, UNet, LeakyUNet
 from tools import accuracy, tools, per_image_error, predVsTarget
 from plotter import myPlots, plotSamp, plotSampRelative
+from NNets import SimpleCNN, SimpleCNNConvT, SimpleCNN_L, SimpleCNN_S, UNet, LeakyUNet, SimpleCNNCat, SimpleCNNJules, SimpleCNNReflect, UNetGPT, UNetBias0, UNetPrelu, SimpleCNNJulesPB, UNetPB, UNetPreluPB
 
 def select_nn(arg, d=None, num_samples=1):
     if arg == "SimpleCNN":
@@ -46,6 +46,33 @@ def select_nn(arg, d=None, num_samples=1):
             pass
     elif arg == "LeakyUNet":
         class DiffSur(LeakyUNet):
+            pass
+    elif arg == "SimpleCNNCat":
+        class DiffSur(SimpleCNNCat):
+            pass
+    elif arg == "SimpleCNNJules":
+        class DiffSur(SimpleCNNJules):
+            pass
+    elif arg == "SimpleCNNReflect":
+        class DiffSur(SimpleCNNReflect):
+            pass
+    elif arg == "UNetGPT":
+        class DiffSur(UNetGPT):
+            pass
+    elif arg == "UNetBias0":
+        class DiffSur(UNetBias0):
+            pass
+    elif arg == "UNetPrelu":
+        class DiffSur(UNetPrelu):
+            pass
+    elif arg == "SimpleCNNJulesPB":
+        class DiffSur(SimpleCNNJulesPB):
+            pass
+    elif arg == "UNetPB":
+        class DiffSur(UNetPB):
+            pass
+    elif arg == "UNetPreluPB":
+        class DiffSur(UNetPreluPB):
             pass
     return DiffSur()
 
@@ -119,6 +146,9 @@ class train(object):
             loss = torch.mean(torch.exp(-torch.abs(torch.ones_like(output) - output)/dict["w"]) * inverse_huber_loss(target,output, C = dict["delta"]))
         elif dict["lossSelection"] == "invhuber2":
             loss = torch.mean(inverse_huber_loss(target,output, C = dict["delta"]))
+        elif dict["lossSelection"] == "mse":
+            loss = nn.MSELoss()(output, target)
+#             loss = nn.mean(torch.abs((output - target)**dict["alph"]))
         return loss
 
     def trainClass(self, epochs=100, snap=25):
@@ -368,7 +398,7 @@ class train(object):
         diffSolv = diffSolv.to(device)
         # criterion = nn.NLLLoss()
         # load_model(self, module, dict)
-        lastEpoch, _, diffSolv = inOut().load_model(diffSolv, "Diff", dict)
+        lastEpoch, _, diffSolv = inOut().load_model(diffSolv, "Diff", dict, tag='Best')
         criterion = self.my_loss
         opt = optim.Adam(diffSolv.parameters(), lr=lr)
         trainloader, testloader = generateDatasets(PATH, datasetName=DATASETNAME, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=self.std_tr, s=self.s, transformation=self.trans, val=True).getDataLoaders()
@@ -577,7 +607,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser("Train Deep Diffusion Solver")
     parser.add_argument('--path', dest="path", type=str, default='/home/' + getpass.getuser() +'/Projects/DiffusionSimple/Results/',
                         help="Specify path to dataset")
-    parser.add_argument('--dataset', dest="dataset", type=str, default="Data",
+    parser.add_argument('--dataset', dest="dataset", type=str, default="Datav2",
                         help="Specify dataset")
     parser.add_argument('--dir', dest="dir", type=str, default="100DGX-" + str(datetime.now()).split(" ")[0],
                         help="Specify directory name associated to model")
