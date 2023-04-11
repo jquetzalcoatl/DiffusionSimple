@@ -24,7 +24,7 @@ sys.path.insert(1, '/home/' + getpass.getuser() + '/Projects/DiffusionSimple/uti
 from loaders import generateDatasets, inOut, saveJSON, loadJSON#, MyData
 from tools import accuracy, tools, per_image_error, predVsTarget, errInDS, errInDS_2, errOverLat
 from plotter import myPlots, plotSamp, plotSampRelative
-from NNets import SimpleCNN, SimpleCNNConvT, SimpleCNN_L, SimpleCNN_S, UNet, LeakyUNet, SimpleCNNCat, SimpleCNNJules, SimpleCNNReflect, UNetGPT, UNetBias0, UNetPrelu, SimpleCNNJulesPB, UNetPB, UNetPreluPB
+from NNets import SimpleCNN, SimpleCNNConvT, SimpleCNN_L, SimpleCNN_S, UNet, LeakyUNet, SimpleCNNCat, SimpleCNNJules, SimpleCNNReflect, UNetGPT, UNetBias0, UNetPrelu, SimpleCNNJulesPB, UNetPB, UNetPreluPB, LeakyUNetPB, UNetBias0PB, SimpleCNNCatPB
 
 def select_nn(arg, d=None, num_samples=1):
     if arg == "SimpleCNN":
@@ -45,6 +45,9 @@ def select_nn(arg, d=None, num_samples=1):
     elif arg == "LeakyUNet":
         class DiffSur(LeakyUNet):
             pass
+    elif arg == "LeakyUNetPB":
+        class DiffSur(LeakyUNetPB):
+            pass
     elif arg == "SimpleCNNCat":
         class DiffSur(SimpleCNNCat):
             pass
@@ -60,6 +63,9 @@ def select_nn(arg, d=None, num_samples=1):
     elif arg == "UNetBias0":
         class DiffSur(UNetBias0):
             pass
+    elif arg == "UNetBias0PB":
+        class DiffSur(UNetBias0PB):
+            pass
     elif arg == "UNetPrelu":
         class DiffSur(UNetPrelu):
             pass
@@ -72,7 +78,11 @@ def select_nn(arg, d=None, num_samples=1):
     elif arg == "UNetPreluPB":
         class DiffSur(UNetPreluPB):
             pass
+    elif arg == "SimpleCNNCatPB":
+        class DiffSur(SimpleCNNCatPB):
+            pass
     return DiffSur()
+
 
 class thelogger(object):
     def logFunc(self, PATH, dict, dir="0"):

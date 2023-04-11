@@ -26,7 +26,7 @@ sys.path.insert(1, '/home/' + getpass.getuser() + '/Projects/DiffusionSimple/uti
 from loaders import generateDatasets, inOut, saveJSON, loadJSON#, MyData
 from tools import accuracy, tools, per_image_error, predVsTarget
 from plotter import myPlots, plotSamp, plotSampRelative
-from NNets import SimpleCNN, SimpleCNNConvT, SimpleCNN_L, SimpleCNN_S, UNet, LeakyUNet, SimpleCNNCat, SimpleCNNJules, SimpleCNNReflect, UNetGPT, UNetBias0, UNetPrelu, SimpleCNNJulesPB, UNetPB, UNetPreluPB
+from NNets import SimpleCNN, SimpleCNNConvT, SimpleCNN_L, SimpleCNN_S, UNet, LeakyUNet, SimpleCNNCat, SimpleCNNJules, SimpleCNNReflect, UNetGPT, UNetBias0, UNetPrelu, SimpleCNNJulesPB, UNetPB, UNetPreluPB, LeakyUNetPB, UNetBias0PB, SimpleCNNCatPB
 
 def select_nn(arg, d=None, num_samples=1):
     if arg == "SimpleCNN":
@@ -47,6 +47,9 @@ def select_nn(arg, d=None, num_samples=1):
     elif arg == "LeakyUNet":
         class DiffSur(LeakyUNet):
             pass
+    elif arg == "LeakyUNetPB":
+        class DiffSur(LeakyUNetPB):
+            pass
     elif arg == "SimpleCNNCat":
         class DiffSur(SimpleCNNCat):
             pass
@@ -62,6 +65,9 @@ def select_nn(arg, d=None, num_samples=1):
     elif arg == "UNetBias0":
         class DiffSur(UNetBias0):
             pass
+    elif arg == "UNetBias0PB":
+        class DiffSur(UNetBias0PB):
+            pass
     elif arg == "UNetPrelu":
         class DiffSur(UNetPrelu):
             pass
@@ -73,6 +79,9 @@ def select_nn(arg, d=None, num_samples=1):
             pass
     elif arg == "UNetPreluPB":
         class DiffSur(UNetPreluPB):
+            pass
+    elif arg == "SimpleCNNCatPB":
+        class DiffSur(SimpleCNNCatPB):
             pass
     return DiffSur()
 
@@ -227,7 +236,10 @@ class train(object):
             error_list_test.append(self.computeError(testloader, diffSolv, epoch, dict))
             self.saveBestModel(PATH, dict, diffSolv, 'Diff', opt, error_list, error_list_test, epoch, dir)
             myPlots().plotDiff(PATH, dir, device, error_list, error_list_test, testloader, diffSolv, epoch, transformation=self.trans, bash=True) #<----------------------------------------------
-            if epoch % snap == snap-1 :
+            if len(error_list) > 11 and error_list[-1] - error_list[-2] > np.std(error_list[-11:-1]) * 10: #<---------TOL
+                _, _, diffSolv = inOut().load_model(diffSolv, "Diff", dict)
+                myLog.logging.info("Rollback!")
+            elif epoch % snap == snap-1 :
                 inOut().save_model(PATH, dict, diffSolv, 'Diff', opt, error_list, error_list_test, epoch, dir)
             if bashTest:
                 break
@@ -399,6 +411,7 @@ class train(object):
         # criterion = nn.NLLLoss()
         # load_model(self, module, dict)
         lastEpoch, _, diffSolv = inOut().load_model(diffSolv, "Diff", dict, tag='Best')
+        lastEpoch = len(dict["Loss"]) - 1
         criterion = self.my_loss
         opt = optim.Adam(diffSolv.parameters(), lr=lr)
         trainloader, testloader = generateDatasets(PATH, datasetName=DATASETNAME, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=self.std_tr, s=self.s, transformation=self.trans, val=True).getDataLoaders()
@@ -424,8 +437,13 @@ class train(object):
             error_list_test.append(self.computeError(testloader, diffSolv, epoch, dict))
             self.saveBestModel(PATH, dict, diffSolv, 'Diff', opt, error_list, error_list_test, epoch, dir)
             myPlots().plotDiff(PATH, dir, device, error_list, error_list_test, testloader, diffSolv, epoch, transformation=self.trans, bash=True)
-
-            if epoch % snap == snap-1 :
+            if len(error_list) > 11 and error_list[-1] - error_list[-2] > np.std(error_list[-11:-1]) * 10: #<---------TOL
+                if epoch == lastEpoch + 1:
+                    _, _, diffSolv = inOut().load_model(diffSolv, "Diff", dict, tag='Best')
+                else:
+                    _, _, diffSolv = inOut().load_model(diffSolv, "Diff", dict)
+                myLog.logging.info("Rollback!")
+            elif epoch % snap == snap-1 :
 #                 inOut().save_model(PATH, dict, disc, 'Disc', optD, error_list, error_list_test, epoch, dir)
                 inOut().save_model(PATH, dict, diffSolv, 'Diff', opt, error_list, error_list_test, epoch, dir)
         myLog.logging.info("Done!!")
