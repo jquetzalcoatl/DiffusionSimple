@@ -238,6 +238,8 @@ class train(object):
             myPlots().plotDiff(PATH, dir, device, error_list, error_list_test, testloader, diffSolv, epoch, transformation=self.trans, bash=True) #<----------------------------------------------
             if len(error_list) > 11 and error_list[-1] - error_list[-2] > np.std(error_list[-11:-1]) * 10: #<---------TOL
                 _, _, diffSolv = inOut().load_model(diffSolv, "Diff", dict)
+                _ = error_list.pop()
+                _ = error_list_test.pop()
                 myLog.logging.info("Rollback!")
             elif epoch % snap == snap-1 :
                 inOut().save_model(PATH, dict, diffSolv, 'Diff', opt, error_list, error_list_test, epoch, dir)
@@ -442,6 +444,8 @@ class train(object):
                     _, _, diffSolv = inOut().load_model(diffSolv, "Diff", dict, tag='Best')
                 else:
                     _, _, diffSolv = inOut().load_model(diffSolv, "Diff", dict)
+                _ = error_list.pop()
+                _ = error_list_test.pop()
                 myLog.logging.info("Rollback!")
             elif epoch % snap == snap-1 :
 #                 inOut().save_model(PATH, dict, disc, 'Disc', optD, error_list, error_list_test, epoch, dir)
