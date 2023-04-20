@@ -147,7 +147,7 @@ def plotSampRelative(theModel, testloader, dict, device, PATH, plotName, n=1, TO
     yhat = theModel(x.to(device))
     yhat, y = transformation_inverse(yhat, y, dict['transformation'])
     
-    er, erF, erS, erList, erFList, erSList = errInSample(data, device, theModel)
+    er, erF, erS, erList, erFList, erSList = errInSample(data, device, theModel, dict)
 
     fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(80.5, 80.5)) #+ torch.ones_like(y[:n]).to(device) * TOL
     

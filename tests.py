@@ -165,7 +165,7 @@ if __name__ == '__main__':
     
     ###Start Here
     PATH = args.path # "/raid/javier/Datasets/DiffSolver/"
-#     DATASETNAME = args.dataset # "All"
+    DATASETNAME = args.dataset # "All"
     os.path.isdir(PATH + "AfterPlots/") or os.mkdir(PATH + "AfterPlots/")
     os.path.isdir(PATH + "AfterPlots/errors/") or os.mkdir(PATH + "AfterPlots/errors/")
     os.path.isdir(PATH + "AfterPlots/Samples/") or os.mkdir(PATH + "AfterPlots/Samples/")
@@ -182,7 +182,7 @@ if __name__ == '__main__':
 
     selectedDirs = {dir : {"mean" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "max" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "maxmean" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "min" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "minmean" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}}}
 
-    datasetNameList = ['Datav2'] # [f'{i}SourcesRdm' for i in range(1,21)]
+    datasetNameList = [DATASETNAME] # [f'{i}SourcesRdm' for i in range(1,21)]
     error, errorField, errorSrc = [], [], []
 
     for selectedDir in selectedDirs.keys():
@@ -250,7 +250,7 @@ if __name__ == '__main__':
     
 #     selectedDirs = {dir : {"mean" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "max" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "maxmean" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "min" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "minmean" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}}}
 
-#     datasetNameList = ['Data']#[f'{i}SourcesRdm' for i in range(1,21)]
+#     datasetNameList = [DATASETNAME]#[f'{i}SourcesRdm' for i in range(1,21)]
 #     error, errorField, errorSrc = [], [], []
 
 #     for selectedDir in selectedDirs.keys():
@@ -382,7 +382,7 @@ if __name__ == '__main__':
     myLog.logging.info(f'JSON object saved')
     
 #     selectedDirs = {dir : {"mean" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "max" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "maxmean" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "min" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}, "minmean" : {"all" : [], "src" : [], "field" : [], "ring1" : [], "ring2" : [], "ring3" : [], "ring4" : []}}}
-#     datasetNameList = ['Data']#[f'{i}SourcesRdm' for i in range(1,21)]
+#     datasetNameList = [DATASETNAME]#[f'{i}SourcesRdm' for i in range(1,21)]
 #     error, errorField, errorSrc = [], [], []
 
 #     for selectedDir in selectedDirs.keys():
@@ -447,14 +447,14 @@ if __name__ == '__main__':
     
 
     myLog.logging.info(f'Generating Sample')
-    dsName = 'Datav2'    #args.dataset #"19SourcesRdm"
-    trainloader, testloader = generateDatasets(PATH, datasetName=dsName ,batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.0, s=256, transformation=dict["transformation"], val=False).getDataLoaders()
+    dsName = DATASETNAME    #args.dataset #"19SourcesRdm"
     plotName = f'Model-{dir}_DS-{dsName}_sample.png'
     os.listdir(os.path.join(PATH, "Dict", dir))[0]
     dict = inOut().loadDict(os.path.join(PATH, "Dict", dir, os.listdir(os.path.join(PATH, "Dict", dir))[0]))
     diffSolve = selectNN(dict)
+    trainloader, testloader = generateDatasets(PATH, datasetName=dsName ,batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.0, s=256, transformation=dict["transformation"], val=False).getDataLoaders()
     try:
-            ep,err, theModel = inOut().load_model(diffSolve, "Diff", dict, tag='Best')
+        ep,err, theModel = inOut().load_model(diffSolve, "Diff", dict, tag='Best')
     except:
         ep,err, theModel = inOut().load_model(diffSolve, "Diff", dict)
 #     ep,err, theModel = inOut().load_model(diffSolve, "Diff", dict)
@@ -464,8 +464,8 @@ if __name__ == '__main__':
 ##################  
     
 
-    os.listdir(os.path.join(PATH, "Dict", dir))[0]
-    dict = inOut().loadDict(os.path.join(PATH, "Dict", dir, os.listdir(os.path.join(PATH, "Dict", dir))[0]))
+#     os.listdir(os.path.join(PATH, "Dict", dir))[0]
+#     dict = inOut().loadDict(os.path.join(PATH, "Dict", dir, os.listdir(os.path.join(PATH, "Dict", dir))[0]))
 #     diffSolve = DiffSur().to(device)
 #     ep,err, theModel = inOut().load_model(diffSolve, "Diff", dict)
 #     theModel.eval();
@@ -494,11 +494,11 @@ if __name__ == '__main__':
     
 ############
     myLog.logging.info(f'Generating Error Vs Boundary Band')
-#     dsName = 'Datav2'    #args.dataset #"19SourcesRdm"
-    trainloader, testloader = generateDatasets(PATH, datasetName=dsName ,batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.0, s=256, transformation=dict["transformation"], val=False).getDataLoaders()
-    dir = args.dir
+#     dsName = DATASETNAME   #args.dataset #"19SourcesRdm"
+#     trainloader, testloader = generateDatasets(PATH, datasetName=dsName ,batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.0, s=256, transformation=dict["transformation"], val=False).getDataLoaders()
+#     dir = args.dir
 #     os.listdir(os.path.join(PATH, "Dict", dir))[0]
-    dict = inOut().loadDict(os.path.join(PATH, "Dict", dir, os.listdir(os.path.join(PATH, "Dict", dir))[0]))
+#     dict = inOut().loadDict(os.path.join(PATH, "Dict", dir, os.listdir(os.path.join(PATH, "Dict", dir))[0]))
     theModel = selectNN(dict)
     try:
             ep,err, theModel = inOut().load_model(diffSolve, "Diff", dict, tag='Best')

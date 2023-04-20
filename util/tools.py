@@ -106,7 +106,7 @@ def predVsTarget(loader, neural_net, device, transformation = "linear", threshol
     return xi, yi, zi
 
 @torch.no_grad()    
-def errInSample(data, device, theModel):
+def errInSample(data, device, theModel, dict):
     error1 = 0.0
     
     error1_field = 0.0
