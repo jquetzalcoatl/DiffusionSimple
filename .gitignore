@@ -3,3 +3,5 @@ Results
 toArraysSecUp.jl
 DataManipulationJulia.ipynb
 mainPy.ipynb
+.ipynb_checkpoints/
+util/__pycache__/
