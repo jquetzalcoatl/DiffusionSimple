@@ -236,7 +236,7 @@ class train(object):
             error_list_test.append(self.computeError(testloader, diffSolv, epoch, dict))
             self.saveBestModel(PATH, dict, diffSolv, 'Diff', opt, error_list, error_list_test, epoch, dir)
             myPlots().plotDiff(PATH, dir, device, error_list, error_list_test, testloader, diffSolv, epoch, transformation=self.trans, bash=True) #<----------------------------------------------
-            if len(error_list) > 11 and error_list[-1] - error_list[-2] > np.std(error_list[-11:-1]) * 10: #<---------TOL
+            if dict["rollback"] and len(error_list) > 11 and error_list[-1] - error_list[-2] > np.std(error_list[-11:-1]) * 10: #<---------TOL
                 _, _, diffSolv = inOut().load_model(diffSolv, "Diff", dict)
                 _ = error_list.pop()
                 _ = error_list_test.pop()
@@ -439,7 +439,7 @@ class train(object):
             error_list_test.append(self.computeError(testloader, diffSolv, epoch, dict))
             self.saveBestModel(PATH, dict, diffSolv, 'Diff', opt, error_list, error_list_test, epoch, dir)
             myPlots().plotDiff(PATH, dir, device, error_list, error_list_test, testloader, diffSolv, epoch, transformation=self.trans, bash=True)
-            if len(error_list) > 11 and error_list[-1] - error_list[-2] > np.std(error_list[-11:-1]) * 10: #<---------TOL
+            if dict["rollback"] and len(error_list) > 11 and error_list[-1] - error_list[-2] > np.std(error_list[-11:-1]) * 10: #<---------TOL
                 if epoch == lastEpoch + 1:
                     _, _, diffSolv = inOut().load_model(diffSolv, "Diff", dict, tag='Best')
                 else:
@@ -680,6 +680,8 @@ if __name__ == '__main__':
                         help="Specify hparam GAN regularizer")
     parser.add_argument('--seed', dest="seed", type=bool, default=False,
                         help="Set seed to 0?")
+    parser.add_argument('--rollback', dest="rollback", type=bool, default=True,
+                        help="Use rollback?")
       
     args = parser.parse_args()
     
@@ -708,6 +710,7 @@ if __name__ == '__main__':
     if args.newtrain:
         dict["NN"] = args.nn
         dict["lr"]=lr
+    dict["rollback"] = args.rollback
     
     
     if "dataset" in dict:
