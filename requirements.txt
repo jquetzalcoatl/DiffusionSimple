@@ -2,12 +2,11 @@ torch
 pandas
 numpy
 matplotlib
-os
+os-sys
 datetime
 torchvision
-json
-PIL
+jsonlib
+pillow
 logging
-sys
 argparse
-getpass
+getpass4
