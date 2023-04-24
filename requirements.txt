@@ -7,6 +7,5 @@ datetime
 torchvision
 jsonlib
 pillow
-logging
 argparse
 getpass4
