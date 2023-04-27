@@ -1748,6 +1748,113 @@ class UNetPreluPB(nn.Module):
         return xfinal
     
     
+class UNetPrelu2PB(nn.Module):
+    def __init__(self):
+        super(UNetPrelu2PB, self).__init__()
+        self.blk1 = nn.Sequential(
+            PeriodicConv2d(3, 64, 3, 1, 1),
+            nn.PReLU(64, -0.02),
+
+            PeriodicConv2d(64, 64, 3, 1, 1),
+            nn.PReLU(64, -0.02),
+        )
+        self.blk2 = nn.Sequential(
+            PeriodicConv2d(64, 128, 3, 1, 1),
+            nn.PReLU(128, -0.02),
+
+            PeriodicConv2d(128, 128, 3, 1, 1),
+            nn.PReLU(128, -0.02),
+        )
+        self.blk3 = nn.Sequential(
+            PeriodicConv2d(128, 256, 3, 1, 1),
+            nn.PReLU(256, -0.02),
+
+            PeriodicConv2d(256, 256, 3, 1, 1),
+            nn.PReLU(256, -0.02),
+        )
+        self.blk4 = nn.Sequential(
+            PeriodicConv2d(256, 512, 3, 1, 1),
+            nn.PReLU(512, -0.02),
+
+            PeriodicConv2d(512, 512, 3, 1, 1),
+            nn.PReLU(512, -0.02),
+        )
+        self.blk5 = nn.Sequential(
+            PeriodicConv2d(512, 1024, 3, 1, 1),
+            nn.PReLU(1024, -0.02),
+
+            PeriodicConv2d(1024, 1024, 3, 1, 1),
+            nn.PReLU(1024, -0.02),
+        )
+        
+        self.blkUp1 = nn.Sequential(
+            PeriodicConv2d(1024, 512, 3, 1, 1),
+            nn.PReLU(512, -0.02),
+
+            PeriodicConv2d(512, 512, 3, 1, 1),
+            nn.PReLU(512, -0.02),
+        )
+        self.blkUp2 = nn.Sequential(
+            PeriodicConv2d(512, 256, 3, 1, 1),
+            nn.PReLU(256, -0.02),
+
+            PeriodicConv2d(256, 256, 3, 1, 1),
+            nn.PReLU(256, -0.02),
+        )
+        self.blkUp3 = nn.Sequential(
+            PeriodicConv2d(256, 128, 3, 1, 1),
+            nn.PReLU(128, -0.02),
+
+            PeriodicConv2d(128, 128, 3, 1, 1),
+            nn.PReLU(128, -0.02),
+        )
+        self.blkUp4 = nn.Sequential(
+            PeriodicConv2d(128, 64, 3, 1, 1),
+            nn.PReLU(64, -0.02),
+
+            PeriodicConv2d(64, 64, 3, 1, 1),
+            nn.PReLU(64, -0.02),
+        )
+        self.upConv1 = nn.Sequential(
+#             nn.Upsample(scale_factor=2),
+#             nn.ConvTranspose2d(1024, 512, 3, 1, 1),
+            nn.ConvTranspose2d(1024, 512, 2, 2, 0)
+        )
+#         self.upConv2 = nn.Sequential(
+#             nn.Upsample(scale_factor=2),
+#             nn.ConvTranspose2d(512, 256, 3, 1, 1),
+#         )
+        self.upConv2 = nn.Sequential(
+            nn.ConvTranspose2d(512, 256, 4, 2, 1),
+        )
+        self.upConv3 = nn.Sequential(
+#             nn.Upsample(scale_factor=2),
+#             nn.ConvTranspose2d(256, 128, 3, 1, 1),
+            nn.ConvTranspose2d(256, 128, 2, 2, 0)
+        )
+        self.upConv4 = nn.Sequential(
+#             nn.Upsample(scale_factor=2),
+#             nn.ConvTranspose2d(128, 64, 3, 1, 1),
+            nn.ConvTranspose2d(128, 64, 2, 2, 0)
+        )
+        self.lastlayer = nn.ConvTranspose2d(64, 1, 3, 1, 1)
+
+    def forward(self, x):
+        x1 = self.blk1(x) #512
+        x2 = self.blk2(nn.MaxPool2d(2, stride=2)(x1)) #256
+        x3 = self.blk3(nn.MaxPool2d(2, stride=2)(x2)) #128
+        x4 = self.blk4(nn.MaxPool2d(2, stride=2)(x3)) #64
+        x5 = self.blk5(nn.MaxPool2d(2, stride=2)(x4)) #32
+
+        x6 = self.blkUp1(torch.cat((self.upConv1(x5), x4), dim=1))
+        x7 = self.blkUp2(torch.cat((self.upConv2(x6), x3), dim=1))
+        x8 = self.blkUp3(torch.cat((self.upConv3(x7), x2), dim=1))
+        x9 = self.blkUp4(torch.cat((self.upConv4(x8), x1), dim=1))
+        xfinal = self.lastlayer(x9)
+
+        return xfinal
+    
+    
 class LeakyUNet(nn.Module):
     def __init__(self):
         super(LeakyUNet, self).__init__()

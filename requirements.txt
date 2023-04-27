@@ -9,3 +9,4 @@ jsonlib
 pillow
 argparse
 getpass4
+scipy
