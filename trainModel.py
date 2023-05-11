@@ -26,7 +26,7 @@ sys.path.insert(1, '/home/' + getpass.getuser() + '/Projects/DiffusionSimple/uti
 from loaders import generateDatasets, inOut, saveJSON, loadJSON#, MyData
 from tools import accuracy, tools, per_image_error, predVsTarget
 from plotter import myPlots, plotSamp, plotSampRelative
-from NNets import SimpleCNN, SimpleCNNConvT, SimpleCNN_L, SimpleCNN_S, UNet, LeakyUNet, SimpleCNNCat, SimpleCNNJules, SimpleCNNReflect, UNetGPT, UNetBias0, UNetPrelu, SimpleCNNJulesPB, UNetPB, UNetPreluPB, LeakyUNetPB, UNetBias0PB, SimpleCNNCatPB, UNetPrelu2PB
+from NNets import SimpleCNN, SimpleCNNConvT, SimpleCNN_L, SimpleCNN_S, UNet, LeakyUNet, SimpleCNNCat, SimpleCNNJules, SimpleCNNReflect, UNetGPT, UNetBias0, UNetPrelu, SimpleCNNJulesPB, UNetPB, UNetPreluPB, LeakyUNetPB, UNetBias0PB, SimpleCNNCatPB, UNetPrelu2PB, UNetPrelu3PB
 
 def select_nn(arg, d=None, num_samples=1):
     if arg == "SimpleCNN":
@@ -85,6 +85,9 @@ def select_nn(arg, d=None, num_samples=1):
             pass
     elif arg == "UNetPrelu2PB":
         class DiffSur(UNetPrelu2PB):
+            pass
+    elif arg == "UNetPrelu3PB":
+        class DiffSur(UNetPrelu3PB):
             pass
     return DiffSur()
 
