@@ -1859,67 +1859,67 @@ class UNetPrelu3PB(nn.Module):
         super(UNetPrelu3PB, self).__init__()
         self.blk1 = nn.Sequential(
             PeriodicConv2d(3, 64, 3, 1, 1),
-            nn.PReLU(64, 1.0),
+            nn.PReLU(64),
 
             PeriodicConv2d(64, 64, 3, 1, 1),
-            nn.PReLU(64, 1.0),
+            nn.PReLU(64),
         )
         self.blk2 = nn.Sequential(
             PeriodicConv2d(64, 128, 3, 1, 1),
-            nn.PReLU(128, 1.0),
+            nn.PReLU(128),
 
             PeriodicConv2d(128, 128, 3, 1, 1),
-            nn.PReLU(128, 1.0),
+            nn.PReLU(128),
         )
         self.blk3 = nn.Sequential(
             PeriodicConv2d(128, 256, 3, 1, 1),
-            nn.PReLU(256, 1.0),
+            nn.PReLU(256),
 
             PeriodicConv2d(256, 256, 3, 1, 1),
-            nn.PReLU(256, 1.0),
+            nn.PReLU(256),
         )
         self.blk4 = nn.Sequential(
             PeriodicConv2d(256, 512, 3, 1, 1),
-            nn.PReLU(512, 1.0),
+            nn.PReLU(512),
 
             PeriodicConv2d(512, 512, 3, 1, 1),
-            nn.PReLU(512, 1.0),
+            nn.PReLU(512),
         )
         self.blk5 = nn.Sequential(
             PeriodicConv2d(512, 1024, 3, 1, 1),
-            nn.PReLU(1024, 1.0),
+            nn.PReLU(1024),
 
             PeriodicConv2d(1024, 1024, 3, 1, 1),
-            nn.PReLU(1024, 1.0),
+            nn.PReLU(1024),
         )
         
         self.blkUp1 = nn.Sequential(
             PeriodicConv2d(1024, 512, 3, 1, 1),
-            nn.PReLU(512, 1.0),
+            nn.PReLU(512),
 
             PeriodicConv2d(512, 512, 3, 1, 1),
-            nn.PReLU(512, 1.0),
+            nn.PReLU(512),
         )
         self.blkUp2 = nn.Sequential(
             PeriodicConv2d(512, 256, 3, 1, 1),
-            nn.PReLU(256, 1.0),
+            nn.PReLU(256),
 
             PeriodicConv2d(256, 256, 3, 1, 1),
-            nn.PReLU(256, 1.0),
+            nn.PReLU(256),
         )
         self.blkUp3 = nn.Sequential(
             PeriodicConv2d(256, 128, 3, 1, 1),
-            nn.PReLU(128, 1.0),
+            nn.PReLU(128),
 
             PeriodicConv2d(128, 128, 3, 1, 1),
-            nn.PReLU(128, 1.0),
+            nn.PReLU(128),
         )
         self.blkUp4 = nn.Sequential(
             PeriodicConv2d(128, 64, 3, 1, 1),
-            nn.PReLU(64, 1.0),
+            nn.PReLU(64),
 
             PeriodicConv2d(64, 64, 3, 1, 1),
-            nn.PReLU(64, 1.0),
+            nn.PReLU(64),
         )
         self.upConv1 = nn.Sequential(
 #             nn.Upsample(scale_factor=2),
