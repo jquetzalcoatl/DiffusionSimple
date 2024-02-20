@@ -480,41 +480,43 @@ if __name__ == '__main__':
 #         trainloader, testloader = generateDatasets(PATH, datasetName=dsName, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.1, s=512, transformation=dict["transformation"]).getDataLoaders()
 #     except:
 #         trainloader, testloader = generateDatasets(PATH, datasetName=dsName, batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.1, s=512).getDataLoaders()
-    myLog.logging.info(f'Generating Error grid...')
-    xi, yi, zi = predVsTarget(testloader, theModel, device, transformation = dict["transformation"], threshold = 0.0, nbins = 100, BATCH_SIZE = BATCH_SIZE, size = 256, lim = 10)
-    dataname = f'Model-{dir}_DS-{dsName}.txt'
-    np.savetxt(os.path.join(PATH, "AfterPlots", "Pred", dataname), zi.reshape(100,100).transpose())
 
-    power = 1/8
-    plotName = f'Model-{dir}_DS-{dsName}_pow-{power}.png'
-    plt.figure(2)
-    plt.pcolormesh(xi, yi, np.power(zi.reshape(xi.shape) / zi.reshape(xi.shape).max(),1/8), shading='auto')
-    plt.plot([0,1],[0,1], c='r', lw=0.2)
-    plt.xlabel("Target")
-    plt.ylabel("Prediction")
-    plt.title(f'Model {dir},\nDataset {dsName}')
-    plt.colorbar()
-    plt.savefig(os.path.join(PATH, "AfterPlots", "Pred", plotName), transparent=False)
-    plt.show()
-    myLog.logging.info(f'Error grid generated')
+
+#     myLog.logging.info(f'Generating Error grid...')
+#     xi, yi, zi = predVsTarget(testloader, theModel, device, transformation = dict["transformation"], threshold = 0.0, nbins = 100, BATCH_SIZE = BATCH_SIZE, size = 256, lim = 10)
+#     dataname = f'Model-{dir}_DS-{dsName}.txt'
+#     np.savetxt(os.path.join(PATH, "AfterPlots", "Pred", dataname), zi.reshape(100,100).transpose())
+
+#     power = 1/8
+#     plotName = f'Model-{dir}_DS-{dsName}_pow-{power}.png'
+#     plt.figure(2)
+#     plt.pcolormesh(xi, yi, np.power(zi.reshape(xi.shape) / zi.reshape(xi.shape).max(),1/8), shading='auto')
+#     plt.plot([0,1],[0,1], c='r', lw=0.2)
+#     plt.xlabel("Target")
+#     plt.ylabel("Prediction")
+#     plt.title(f'Model {dir},\nDataset {dsName}')
+#     plt.colorbar()
+#     plt.savefig(os.path.join(PATH, "AfterPlots", "Pred", plotName), transparent=False)
+#     plt.show()
+#     myLog.logging.info(f'Error grid generated')
     
-############
-    myLog.logging.info(f'Generating Error Vs Boundary Band')
-#     dsName = DATASETNAME   #args.dataset #"19SourcesRdm"
-#     trainloader, testloader = generateDatasets(PATH, datasetName=dsName ,batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.0, s=256, transformation=dict["transformation"], val=False).getDataLoaders()
-#     dir = args.dir
-#     os.listdir(os.path.join(PATH, "Dict", dir))[0]
-#     dict = inOut().loadDict(os.path.join(PATH, "Dict", dir, os.listdir(os.path.join(PATH, "Dict", dir))[0]))
-    theModel = selectNN(dict)
-    try:
-            ep,err, theModel = inOut().load_model(diffSolve, "Diff", dict, tag='Best')
-    except:
-        ep,err, theModel = inOut().load_model(diffSolve, "Diff", dict)
-#     ep,err, theModel = inOut().load_model(diffSolve, "Diff", dict)
-    theModel.eval();
-    dd = errOverLat(theModel, testloader, device, transformation="linear", error_fnc=nn.MSELoss(reduction='none'))
-    saveJSON(dd, os.path.join(PATH, "AfterPlots", "errorsVsBoundaryBand"), f'errorVsBB-{dir}.json')
-    myLog.logging.info(f'JSON object saved')
+# ############
+#     myLog.logging.info(f'Generating Error Vs Boundary Band')
+# #     dsName = DATASETNAME   #args.dataset #"19SourcesRdm"
+# #     trainloader, testloader = generateDatasets(PATH, datasetName=dsName ,batch_size=BATCH_SIZE, num_workers=NUM_WORKERS, std_tr=0.0, s=256, transformation=dict["transformation"], val=False).getDataLoaders()
+# #     dir = args.dir
+# #     os.listdir(os.path.join(PATH, "Dict", dir))[0]
+# #     dict = inOut().loadDict(os.path.join(PATH, "Dict", dir, os.listdir(os.path.join(PATH, "Dict", dir))[0]))
+#     theModel = selectNN(dict)
+#     try:
+#             ep,err, theModel = inOut().load_model(diffSolve, "Diff", dict, tag='Best')
+#     except:
+#         ep,err, theModel = inOut().load_model(diffSolve, "Diff", dict)
+# #     ep,err, theModel = inOut().load_model(diffSolve, "Diff", dict)
+#     theModel.eval();
+#     dd = errOverLat(theModel, testloader, device, transformation="linear", error_fnc=nn.MSELoss(reduction='none'))
+#     saveJSON(dd, os.path.join(PATH, "AfterPlots", "errorsVsBoundaryBand"), f'errorVsBB-{dir}.json')
+#     myLog.logging.info(f'JSON object saved')
 
 
 #How to run
